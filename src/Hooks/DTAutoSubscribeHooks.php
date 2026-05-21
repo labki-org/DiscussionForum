@@ -135,26 +135,16 @@ class DTAutoSubscribeHooks {
 		// keeps the workaround from being more aggressive than the
 		// upstream behaviour we're emulating.
 		//
-		// DT 1.44+ returns getAuthorsBelow() as an array of
+		// DT (since some 1.4x bump — confirmed on 1.44) returns
+		// getAuthorsBelow() as an array of
 		//   [ 'username' => string, 'displayNames' => string[] ]
 		// entries (see ContentThreadItem::calculateThreadSummary in DT).
-		// Older DT versions returned a flat string[] of usernames. Accept
-		// both shapes so the workaround doesn't silently break on each
-		// DT bump — strict in_array against a string would always be
-		// false against the assoc-array form, which is exactly the bug
-		// we hit on miniscope.org's production DT.
-		$saverName = $user->getName();
-		$isAuthor = false;
-		foreach ( $heading->getAuthorsBelow() as $author ) {
-			$name = is_array( $author )
-				? ( $author['username'] ?? '' )
-				: (string)$author;
-			if ( $name === $saverName ) {
-				$isAuthor = true;
-				break;
-			}
-		}
-		if ( !$isAuthor ) {
+		// Strict in_array against a plain string username would always
+		// return false against the assoc-array form, silently
+		// suppressing every subscribe write — exactly the bug we hit
+		// on miniscope.org's production DT.
+		$authors = array_column( $heading->getAuthorsBelow(), 'username' );
+		if ( !in_array( $user->getName(), $authors, true ) ) {
 			return;
 		}
 
