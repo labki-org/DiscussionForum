@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **`DTAutoSubscribeHooks` now handles the DT 1.44+ author shape.** Upstream
+  DiscussionTools changed `ContentThreadItem::getAuthorsBelow()` to return
+  an array of `[ 'username' => string, 'displayNames' => string[] ]`
+  associative arrays (was previously a flat `string[]` of usernames). The
+  workaround's `in_array( $user->getName(), $authors, true )` author-gate
+  was strict-comparing a string against an associative array on the new
+  shape and always returning false, suppressing every subscribe write. The
+  comparison now extracts `username` defensively and accepts both shapes,
+  so the workaround keeps working across the DT version bump.
 - **DTAnnotateJob no longer runs `RefreshLinksJob` inline.** The vintage
   did `( new RefreshLinksJob( $title, [] ) )->run()` from within the job's
   `run()` method to immediately re-parse the page so SMW would pick up the
