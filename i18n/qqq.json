@@ -1,0 +1,14 @@
+{
+	"@metadata": {
+		"authors": [
+			"Daniel Aharoni"
+		]
+	},
+	"discussionforum-desc": "{{desc|name=DiscussionForum|url=https://github.com/labki-org/DiscussionForum}}",
+	"discussionforum-maintenance-backfill-summary": "Description shown by maintenance/backfillForumAnnotations.php when run with --help. Explains that the script is for backfilling existing topics that pre-date the extension load.",
+	"discussionforum-prop-has-forum": "Label of the SMW property that points each topic page back at its containing forum landing page. Used in chained #ask queries like [[Has forum.Has parent forum::Forum:Home]] for activity feeds. Internal property ID is ___forum_parent.",
+	"discussionforum-prop-topic-subject": "Label of the SMW property that mirrors the first H2 heading on a topic page. Internal property ID is ___forum_subject.",
+	"discussionforum-prop-topic-starter": "Label of the SMW property that records the User: page of the topic's oldest reply author (the original poster). Internal property ID is ___forum_starter.",
+	"discussionforum-prop-comment-count": "Label of the SMW property that records the DT-derived count of signed comments on a topic page. Internal property ID is ___forum_comments.",
+	"discussionforum-prop-participant-count": "Label of the SMW property that records the DT-derived count of unique comment authors on a topic page. Internal property ID is ___forum_participants."
+}

@@ -1,0 +1,41 @@
+{
+	"name": "labki-org/discussion-forum",
+	"type": "mediawiki-extension",
+	"description": "Forum-style discussion topics on top of DiscussionTools, with SMW properties for forum-index #ask queries and auto-watch subscriptions.",
+	"keywords": [
+		"MediaWiki",
+		"DiscussionTools",
+		"SemanticMediaWiki",
+		"forum",
+		"discussion"
+	],
+	"license": "GPL-3.0-or-later",
+	"authors": [
+		{ "name": "Daniel Aharoni" }
+	],
+	"require": {
+		"php": ">=8.1.0",
+		"composer/installers": "^1.0.1|^2.0"
+	},
+	"require-dev": {
+		"mediawiki/mediawiki-codesniffer": ">=48.0",
+		"mediawiki/mediawiki-phan-config": ">=0.15.0",
+		"mediawiki/minus-x": ">=1.1.3",
+		"php-parallel-lint/php-parallel-lint": "1.4.0",
+		"php-parallel-lint/php-console-highlighter": "1.0.0",
+		"phpunit/phpunit": "^9.6"
+	},
+	"autoload": {
+		"psr-4": {
+			"MediaWiki\\Extension\\DiscussionForum\\": "src/"
+		}
+	},
+	"scripts": {
+		"test": [
+			"parallel-lint . --exclude vendor --exclude node_modules",
+			"@phpcs",
+			"minus-x check ."
+		],
+		"phpcs": "phpcs -p -s"
+	}
+}

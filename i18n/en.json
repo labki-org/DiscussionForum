@@ -1,0 +1,14 @@
+{
+	"@metadata": {
+		"authors": [
+			"Daniel Aharoni"
+		]
+	},
+	"discussionforum-desc": "Forum-style discussion topics on top of DiscussionTools, with SMW properties for forum-index #ask queries and auto-watch subscriptions.",
+	"discussionforum-maintenance-backfill-summary": "Enqueue DT annotation jobs for every existing forum topic page so SMW indexes the DT-derived comment count, participant count, and topic starter for content created before this extension was loaded.",
+	"discussionforum-prop-has-forum": "Has forum",
+	"discussionforum-prop-topic-subject": "Topic subject",
+	"discussionforum-prop-topic-starter": "Topic starter",
+	"discussionforum-prop-comment-count": "Comment count",
+	"discussionforum-prop-participant-count": "Participant count"
+}

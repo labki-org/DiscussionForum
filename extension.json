@@ -1,0 +1,83 @@
+{
+	"name": "DiscussionForum",
+	"version": "0.1.0",
+	"author": [
+		"Daniel Aharoni"
+	],
+	"url": "https://github.com/labki-org/DiscussionForum",
+	"descriptionmsg": "discussionforum-desc",
+	"license-name": "GPL-3.0-or-later",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.43.0",
+		"extensions": {
+			"DiscussionTools": "*",
+			"SemanticMediaWiki": "*"
+		}
+	},
+	"MessagesDirs": {
+		"DiscussionForum": [
+			"i18n"
+		]
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\DiscussionForum\\": "src/"
+	},
+	"TestAutoloadNamespaces": {
+		"MediaWiki\\Extension\\DiscussionForum\\Tests\\": "tests/phpunit/"
+	},
+	"HookHandlers": {
+		"PropertyRegistration": {
+			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\PropertyRegistrationHooks"
+		},
+		"TopicAnnotation": {
+			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicAnnotationHooks"
+		},
+		"TopicPage": {
+			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicPageHooks"
+		},
+		"PostSave": {
+			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\PostSaveHooks"
+		},
+		"DTAutoSubscribe": {
+			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\DTAutoSubscribeHooks"
+		}
+	},
+	"Hooks": {
+		"SMW::Property::initProperties": "PropertyRegistration",
+		"ParserAfterParse": "TopicAnnotation",
+		"BeforePageDisplay": "TopicPage",
+		"PageSaveComplete": [
+			"PostSave",
+			"DTAutoSubscribe"
+		]
+	},
+	"JobClasses": {
+		"discussionForumAnnotate": "MediaWiki\\Extension\\DiscussionForum\\Jobs\\DTAnnotateJob"
+	},
+	"ResourceModules": {
+		"ext.discussionforum.styles": {
+			"styles": [ "resources/ext.discussionforum.less" ],
+			"targets": [ "desktop", "mobile" ]
+		},
+		"ext.discussionforum": {
+			"scripts": [ "resources/ext.discussionforum.js" ],
+			"dependencies": [ "mediawiki.util", "mediawiki.user" ],
+			"targets": [ "desktop", "mobile" ]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "DiscussionForum"
+	},
+	"config": {
+		"DiscussionForumPatchAutoSubscribeTZBug": {
+			"value": true,
+			"description": "Workaround for upstream DiscussionTools bug where the 'archiving guard' in EventDispatcher::generateEventsFromItemSets() compares a $wgLocaltimezone-parsed revision timestamp against a UTC-parsed signature timestamp, suppressing dt-subscribed-new-comment events on any wiki where $wgLocaltimezone is not UTC. When true (default), DiscussionForum writes the missing discussiontools_subscription row directly for forum-namespace saves. Set to false once the upstream patch is in the deployed DT version."
+		}
+	},
+	"ConfigRegistry": {
+		"DiscussionForum": "GlobalVarConfig::newInstance"
+	},
+	"manifest_version": 2
+}

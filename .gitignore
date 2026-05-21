@@ -1,0 +1,29 @@
+# Composer
+/vendor/
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/logs/
+
+# Test artefacts
+/coverage/
+.phpunit.result.cache
+phpunit.xml
+
+# PHPCS / linters
+.phpcs-cache
+.eslintcache
+
+# Node (if frontend tooling is added later)
+/node_modules/
