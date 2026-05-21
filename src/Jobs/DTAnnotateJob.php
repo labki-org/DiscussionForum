@@ -95,11 +95,35 @@ class DTAnnotateJob extends Job {
 		// re-enqueues this job) repopulates.
 		$stash->set( $key, $payload, $stash::TTL_MONTH );
 
-		// Force SMW to re-store the page with the fresh DT data flowing
-		// through ParserAfterParse. RefreshLinksJob re-renders, which
-		// runs the annotation hook (now with a cache hit) and SMW's
-		// LinksUpdate.
-		( new RefreshLinksJob( $title, [] ) )->run();
+		// Queue (don't inline-run) a RefreshLinksJob to re-parse the
+		// page. ParserAfterParse there reads the stash we just wrote
+		// and contributes the DT-derived properties through SMW's
+		// LinksUpdate, gated by OPT_FORCED_UPDATE so the same-revision
+		// re-store actually lands.
+		//
+		// Why queued, not inline: running RefreshLinksJob inline from
+		// inside this job's run() collides with the outer JobRunner's
+		// transaction round —
+		//   DBTransactionError: 'transaction round
+		//   MediaWiki\Extension\DiscussionForum\Jobs\DTAnnotateJob::run'
+		//   already started
+		// — and on production we observed that exception leaving
+		// the parent job half-claimed (job_token set, but
+		// job_token_timestamp NULL). The upstream
+		// recycleAndDeleteStaleJobs sweep filters
+		// `job_token_timestamp < cutoff`, which doesn't match NULL,
+		// so the stuck rows are never reclaimed and the queue jams.
+		// Pushing to the queue lets this job ack-and-release cleanly;
+		// RefreshLinksJob runs on the next tick in its own round.
+		//
+		// Dedup safety: RefreshLinksJob's removeDuplicates collapses
+		// our push against any RefreshLinksJob already queued for
+		// this title (e.g. from MW core's own post-save deferred
+		// updates). Either job's run reads the latest-revision stash
+		// entry we just wrote — the data lands either way.
+		$services->getJobQueueGroup()->push(
+			new RefreshLinksJob( $title, [] )
+		);
 
 		return true;
 	}

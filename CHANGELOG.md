@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **DTAnnotateJob no longer runs `RefreshLinksJob` inline.** The vintage
+  did `( new RefreshLinksJob( $title, [] ) )->run()` from within the job's
+  `run()` method to immediately re-parse the page so SMW would pick up the
+  freshly-stashed DT bundle. Inline execution collides with the outer
+  `JobRunner`'s transaction round (`DBTransactionError: transaction round
+  'MediaWiki\Extension\DiscussionForum\Jobs\DTAnnotateJob::run' already
+  started`). On production miniscope.org the resulting exception path
+  left rows half-claimed in the `job` table — `job_token` set but
+  `job_token_timestamp` NULL — and upstream MW's
+  `recycleAndDeleteStaleJobs` doesn't match NULL timestamps, so the
+  stuck rows jammed the queue forever. The job now pushes the
+  `RefreshLinksJob` to the queue instead; it runs in its own round on
+  the next tick, ack-and-release works normally, and SMW still picks up
+  the DT bundle through `ParserAfterParse` reading the stash.
+
 ### Added
 - Initial extraction from `labki-platform`'s inline forum block (commit history
   for the migrated code lives in `labki-org/labki-platform`, primarily under
