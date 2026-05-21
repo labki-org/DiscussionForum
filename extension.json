@@ -31,7 +31,8 @@
 		"ParserAfterParse": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicAnnotationHooks::onParserAfterParse",
 		"BeforePageDisplay": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicPageHooks::onBeforePageDisplay",
 		"PageSaveComplete": [
-			"MediaWiki\\Extension\\DiscussionForum\\Hooks\\PostSaveHooks::onPageSaveComplete"
+			"MediaWiki\\Extension\\DiscussionForum\\Hooks\\PostSaveHooks::onPageSaveComplete",
+			"MediaWiki\\Extension\\DiscussionForum\\Hooks\\DTAutoSubscribeHooks::onPageSaveComplete"
 		]
 	},
 	"JobClasses": {
