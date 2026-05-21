@@ -1,0 +1,265 @@
+/**
+ * DiscussionForum styles. Two surfaces: the .discussionforum-new-post-btn
+ * entry point, and html.discussionforum-topic (set server-side on
+ * Talk-namespace subpages by TopicPageHooks) which restyles the page as
+ * a single-topic forum card.
+ *
+ * Colours use Codex tokens with hex fallbacks so light/dark theming works.
+ */
+
+/* === New-post button === */
+
+.discussionforum-new-post-btn {
+	display: inline-block;
+	padding: 0.4em 1em;
+	border: 1px solid var( --border-color-progressive, #36c );
+	border-radius: 4px;
+	background: var( --background-color-progressive, #36c );
+	color: #fff;
+	font-weight: 500;
+	text-decoration: none;
+	cursor: pointer;
+	user-select: none;
+
+	&:hover {
+		background: var( --background-color-progressive--hover, #447ff5 );
+		border-color: var( --border-color-progressive--hover, #447ff5 );
+		color: #fff;
+		text-decoration: none;
+	}
+}
+
+/* === Forum topic page (body class set by TopicPageHooks::onBeforePageDisplay) === */
+
+html.discussionforum-topic {
+
+	/* Hide elements not useful in a single-topic-per-page layout */
+	#firstHeading,
+	.firstHeading,
+	#toc,
+	.toc,
+	#siteSub,
+	.mw-pt-translate-header,
+	.ext-discussiontools-init-pageframe-latestcomment {
+		display: none !important;
+	}
+
+	/* Breadcrumb back-link to the forum landing page, populated by
+	   addSubtitle in TopicPageHooks. Sits in #contentSub above the
+	   topic card. */
+	.discussionforum-back {
+		display: inline-block;
+		margin-bottom: 0.5em;
+		color: var( --color-subtle, #54595d );
+		font-size: 0.95em;
+		text-decoration: none;
+
+		&:hover {
+			color: var( --color-progressive--hover, #447ff5 );
+			text-decoration: underline;
+		}
+	}
+
+	/* Outer card frame around the topic content */
+	.mw-parser-output {
+		border: 1px solid var( --border-color-base, #c8ccd1 );
+		border-radius: 8px;
+		padding: 1em 1.25em;
+		background: var( --background-color-base, #fff );
+		box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.04 );
+	}
+
+	/* DT section bar (comment count / latest activity under the H2) */
+	.ext-discussiontools-init-section-bar {
+		border-bottom: 1px solid var( --border-color-subtle, #eaecf0 );
+		padding-bottom: 0.5em;
+		margin-bottom: 1em;
+		font-size: 0.9em;
+		color: var( --color-subtle, #54595d );
+	}
+
+	/* First post — every top-level block (paragraph, list, blockquote,
+	   pre/code) renders as part of one continuous accent-bar card. Each
+	   block has zero margin so the bar stays unbroken across types;
+	   non-pre blocks share the neutral first-post background, while
+	   <pre> keeps its own code styling and just picks up the accent. */
+	.mw-parser-output > p,
+	.mw-parser-output > ul,
+	.mw-parser-output > ol,
+	.mw-parser-output > blockquote {
+		background: var( --background-color-neutral-subtle, #f8f9fa );
+		border-left: 3px solid var( --border-color-progressive, #36c );
+		padding: 0.6em 0.85em;
+		/* !important: Tweeki's sitewide `p { margin-bottom: 1em }` (and
+		   Bootstrap's matching ul/ol margin) would otherwise leave a
+		   stripe-less gap between adjacent first-post blocks. */
+		margin: 0 !important;
+		border-radius: 0;
+	}
+
+	/* Lists: preserve the native padding-left so bullet/number markers
+	   render inside the coloured block instead of being clipped off the
+	   left edge by our own 0.85em horizontal padding. */
+	.mw-parser-output > ul,
+	.mw-parser-output > ol {
+		padding-left: 2.5em;
+	}
+
+	/* Pre/code blocks: undo Tweeki's #content-scoped 1px box-border + radius
+	   so the accent stripe stays continuous with sibling first-post blocks.
+	   !important on the borders is needed because Tweeki's `#content pre`
+	   selector outranks ours by ID specificity. The code background and
+	   font-family from Tweeki still apply, keeping the code visually
+	   distinct. */
+	.mw-parser-output > pre,
+	.mw-parser-output > .mw-highlight {
+		border: 0 !important;
+		border-left: 3px solid var( --border-color-progressive, #36c ) !important;
+		border-radius: 0 !important;
+		margin: 0 !important;
+	}
+
+	/* Adjacent paragraphs read as one block — drop the seam padding. */
+	.mw-parser-output > p + p {
+		padding-top: 0;
+	}
+
+	/* Replies — DT writes ":" indent which renders as <dl><dd>. Tweeki
+	   resets dd margins to 0; we re-introduce an indent and a soft card
+	   look per nesting level. !important is needed to outrank Tweeki's
+	   sitewide reset. */
+	#mw-content-text {
+
+		dl {
+			margin: 0.5em 0;
+		}
+
+		dd {
+			margin-left: 1.75em !important;
+			padding: 0.5em 0.85em;
+			border-left: 2px solid var( --border-color-muted, #d3d4d5 );
+			background: var( --background-color-neutral-subtle, #f8f9fa );
+			border-radius: 0 4px 4px 0;
+			margin-bottom: 0.5em;
+		}
+
+		dd dd {
+			margin-left: 1.25em !important;
+			background: var( --background-color-base, #fff );
+		}
+
+		dd dd dd {
+			border-left-color: var( --border-color-subtle, #eaecf0 );
+		}
+
+		/* Multi-paragraph replies stay as one continuous block within a dd */
+		dd p {
+			margin: 0;
+		}
+		dd p + p {
+			padding-top: 0.4em;
+		}
+
+		/* Bullet/number lists inside a reply: trim browser's default
+		   ~40px padding-left so the marker doesn't end up pushed far
+		   past the surrounding reply text. The reply card's own
+		   horizontal padding already provides the inset; we just need
+		   enough room for the list marker itself. */
+		dd ul,
+		dd ol {
+			padding-left: 1.5em;
+			margin: 0.25em 0;
+		}
+
+		/* Pre/code blocks inside a reply: same fix as first-post pre —
+		   strip Tweeki's #content-scoped 1px box border + radius so the
+		   pre flows naturally inside the reply card instead of breaking
+		   the visual continuity. !important needed because Tweeki's ID
+		   specificity outranks ours. The code background and font from
+		   Tweeki still apply, keeping code visually distinct. */
+		dd pre,
+		dd .mw-highlight {
+			border: 0 !important;
+			border-radius: 0 !important;
+			margin: 0.25em 0 !important;
+		}
+
+		/* Empty pre/p left over from MW parser quirks — e.g. wikitext
+		   like ":<pre>" / ":content" / ":</pre>" where the parser puts
+		   the open tag, content, and close tag each into separate <dd>s,
+		   leaving an empty <pre> renderable. Hiding these stops them
+		   from appearing as stray gray bars in a reply card. */
+		dd pre:empty,
+		dd p:empty {
+			display: none;
+		}
+
+		/* Multi-line replies (consecutive `::` lines) flow as one
+		   continuous comment card instead of fragmenting into a stack
+		   of small per-line cards. Each line is parsed as a sibling
+		   <dd> within one <dl>, so we drop intra-group margins and
+		   only round the outer corners of the group. */
+		dl > dd {
+			margin-bottom: 0;
+			border-radius: 0;
+		}
+		dl > dd + dd {
+			padding-top: 0;
+		}
+		dl > dd:last-child {
+			border-bottom-right-radius: 4px;
+			margin-bottom: 0.5em;
+		}
+		dl > dd:first-child {
+			border-top-right-radius: 4px;
+		}
+	}
+
+	/* Don't apply reply-card chrome inside DT/VE editing surfaces — the
+	   user is composing, not reading a saved reply, so the accent stripe
+	   and tinted background read as cruft layered onto the textarea.
+	   Two forms: dd/dl *inside* the editor (some VE surfaces nest one),
+	   AND the wrapping dd that DT inserts to host the reply widget,
+	   targeted via :has() since our forum stripe lives on that parent. */
+	.ext-discussiontools-replywidget,
+	.ve-ce-surface,
+	.ve-ui-surface {
+		dl,
+		dd {
+			margin: 0 !important;
+			padding: 0 !important;
+			border: 0 !important;
+			background: transparent !important;
+			border-radius: 0 !important;
+		}
+	}
+	#mw-content-text dd:has( .ext-discussiontools-replywidget ),
+	#mw-content-text dd:has( .ext-discussiontools-ui-replyWidget ),
+	#mw-content-text dd:has( .ve-ce-surface ) {
+		margin-left: 0 !important;
+		padding: 0 !important;
+		border: 0 !important;
+		background: transparent !important;
+		border-radius: 0 !important;
+	}
+
+	/* Reply links rendered as small bordered buttons next to each signature */
+	a.ext-discussiontools-init-replylink-reply,
+	.ext-discussiontools-init-replylink-buttons a {
+		display: inline-block;
+		padding: 0.15em 0.6em;
+		margin-left: 0.4em;
+		border: 1px solid var( --border-color-base, #c8ccd1 );
+		border-radius: 4px;
+		background: var( --background-color-interactive-subtle, #f8f9fa );
+		color: var( --color-base, #202122 ) !important;
+		font-size: 0.9em;
+		font-weight: 500;
+		text-decoration: none !important;
+
+		&:hover {
+			background: var( --background-color-interactive, #eaecf0 );
+			border-color: var( --border-color-base--hover, #a2a9b1 );
+		}
+	}
+}

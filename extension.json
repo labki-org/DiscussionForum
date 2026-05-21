@@ -26,30 +26,12 @@
 	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\DiscussionForum\\Tests\\": "tests/phpunit/"
 	},
-	"HookHandlers": {
-		"PropertyRegistration": {
-			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\PropertyRegistrationHooks"
-		},
-		"TopicAnnotation": {
-			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicAnnotationHooks"
-		},
-		"TopicPage": {
-			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicPageHooks"
-		},
-		"PostSave": {
-			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\PostSaveHooks"
-		},
-		"DTAutoSubscribe": {
-			"class": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\DTAutoSubscribeHooks"
-		}
-	},
 	"Hooks": {
-		"SMW::Property::initProperties": "PropertyRegistration",
-		"ParserAfterParse": "TopicAnnotation",
-		"BeforePageDisplay": "TopicPage",
+		"SMW::Property::initProperties": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\PropertyRegistrationHooks::onInitProperties",
+		"ParserAfterParse": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicAnnotationHooks::onParserAfterParse",
+		"BeforePageDisplay": "MediaWiki\\Extension\\DiscussionForum\\Hooks\\TopicPageHooks::onBeforePageDisplay",
 		"PageSaveComplete": [
-			"PostSave",
-			"DTAutoSubscribe"
+			"MediaWiki\\Extension\\DiscussionForum\\Hooks\\PostSaveHooks::onPageSaveComplete"
 		]
 	},
 	"JobClasses": {
@@ -62,7 +44,11 @@
 		},
 		"ext.discussionforum": {
 			"scripts": [ "resources/ext.discussionforum.js" ],
-			"dependencies": [ "mediawiki.util", "mediawiki.user" ],
+			"dependencies": [
+				"mediawiki.util",
+				"mediawiki.Title",
+				"mediawiki.notification"
+			],
 			"targets": [ "desktop", "mobile" ]
 		}
 	},
