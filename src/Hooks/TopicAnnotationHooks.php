@@ -144,6 +144,6 @@ class TopicAnnotationHooks {
 				);
 			}
 		}
-		$parserData->pushSemanticDataToParserOutput();
+		$parserData->copyToParserOutput();
 	}
 }
